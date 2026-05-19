@@ -1,0 +1,15 @@
+sprawdzanie localhostem
+
+data
+jakosc
+produkt
+klient
+kraj
+zrodlo
+transakcje
+
+Wejscie na strone główną:
+http://localhost:8088/
+
+przykład postman:
+http://localhost:8088/transakcje

@@ -1,0 +1,193 @@
+INSERT INTO [HD_04].[dbo].[SalesClean]
+(
+    SourceDataset,
+    TransactionNo,
+    TransactionDate,
+    DateKey,
+    ProductNo,
+    ProductName,
+    UnitPrice,
+    Quantity,
+    CustomerNo,
+    Country,
+    LineAmount,
+    AbsLineAmount,
+    SalesYear,
+    SalesMonth,
+    SalesQuarter,
+    SalesDay,
+    IsCancelled,
+    IsReturn,
+    IsCustomerKnown,
+    IsUnitedKingdom,
+    IsWeekend,
+    CountryGroup,
+    PriceBand,
+    QuantityBand,
+    ProductCategory,
+    TransactionType,
+    DataQualityFlag
+)
+SELECT
+    NULLIF(LTRIM(RTRIM(r.SourceDataset)), '') AS SourceDataset,
+
+    NULLIF(LTRIM(RTRIM(r.TransactionNo)), '') AS TransactionNo,
+
+    ca.TransactionDate,
+
+    CASE
+        WHEN ca.TransactionDate IS NOT NULL
+        THEN YEAR(ca.TransactionDate) * 10000
+           + MONTH(ca.TransactionDate) * 100
+           + DAY(ca.TransactionDate)
+        ELSE NULL
+    END AS DateKey,
+
+    NULLIF(LTRIM(RTRIM(r.ProductNo)), '') AS ProductNo,
+    NULLIF(LTRIM(RTRIM(r.ProductName)), '') AS ProductName,
+
+    ca.UnitPrice,
+    ca.Quantity,
+    ca.CustomerNo,
+
+    NULLIF(LTRIM(RTRIM(r.Country)), '') AS Country,
+
+    CASE
+        WHEN ca.Quantity IS NOT NULL AND ca.UnitPrice IS NOT NULL
+        THEN CAST(CAST(ca.Quantity AS DECIMAL(19,2)) * ca.UnitPrice AS DECIMAL(19,2))
+        ELSE NULL
+    END AS LineAmount,
+
+    CASE
+        WHEN ca.Quantity IS NOT NULL AND ca.UnitPrice IS NOT NULL
+        THEN ABS(CAST(CAST(ca.Quantity AS DECIMAL(19,2)) * ca.UnitPrice AS DECIMAL(19,2)))
+        ELSE NULL
+    END AS AbsLineAmount,
+
+    YEAR(ca.TransactionDate) AS SalesYear,
+    MONTH(ca.TransactionDate) AS SalesMonth,
+    DATEPART(QUARTER, ca.TransactionDate) AS SalesQuarter,
+    DAY(ca.TransactionDate) AS SalesDay,
+
+    CASE
+        WHEN LEFT(LTRIM(RTRIM(r.TransactionNo)), 1) = 'C' OR ca.Quantity < 0 THEN 1
+        ELSE 0
+    END AS IsCancelled,
+
+    CASE
+        WHEN ca.Quantity < 0 THEN 1
+        ELSE 0
+    END AS IsReturn,
+
+    CASE
+        WHEN ca.CustomerNo IS NULL THEN 0
+        ELSE 1
+    END AS IsCustomerKnown,
+
+    CASE
+        WHEN LTRIM(RTRIM(r.Country)) = 'United Kingdom' THEN 1
+        ELSE 0
+    END AS IsUnitedKingdom,
+
+    CASE
+        WHEN ca.TransactionDate IS NULL THEN NULL
+        WHEN DATEDIFF(DAY, '19000101', CAST(ca.TransactionDate AS DATE)) % 7 IN (5,6) THEN 1
+        ELSE 0
+    END AS IsWeekend,
+
+    CASE
+        WHEN r.Country IS NULL OR LTRIM(RTRIM(r.Country)) = '' THEN 'Brak kraju'
+        WHEN LTRIM(RTRIM(r.Country)) = 'United Kingdom' THEN 'UK'
+        ELSE 'Export'
+    END AS CountryGroup,
+
+    CASE
+        WHEN ca.UnitPrice IS NULL THEN 'Brak ceny'
+        WHEN ca.UnitPrice = 0 THEN 'Cena 0'
+        WHEN ca.UnitPrice < 0 THEN 'Cena ujemna'
+        WHEN ca.UnitPrice < 5 THEN 'Tanie'
+        WHEN ca.UnitPrice < 20 THEN 'Średnie'
+        ELSE 'Drogie'
+    END AS PriceBand,
+
+    CASE
+        WHEN ca.Quantity IS NULL THEN 'Brak ilości'
+        WHEN ca.Quantity < 0 THEN 'Zwrot'
+        WHEN ca.Quantity = 0 THEN 'Ilość 0'
+        WHEN ca.Quantity = 1 THEN 'Pojedynczy zakup'
+        WHEN ca.Quantity BETWEEN 2 AND 10 THEN 'Mały zakup'
+        WHEN ca.Quantity BETWEEN 11 AND 50 THEN 'Większy zakup'
+        ELSE 'Hurtowy zakup'
+    END AS QuantityBand,
+
+    CASE
+        WHEN r.ProductName IS NULL OR LTRIM(RTRIM(r.ProductName)) = '' THEN 'Brak opisu'
+        WHEN UPPER(r.ProductName) LIKE '%CHRISTMAS%' THEN 'Christmas'
+        WHEN UPPER(r.ProductName) LIKE '%BAG%' THEN 'Bags'
+        WHEN UPPER(r.ProductName) LIKE '%CANDLE%'
+          OR UPPER(r.ProductName) LIKE '%LIGHT%'
+          OR UPPER(r.ProductName) LIKE '%LANTERN%' THEN 'Lighting'
+        WHEN UPPER(r.ProductName) LIKE '%HEART%'
+          OR UPPER(r.ProductName) LIKE '%DECOR%' THEN 'Home decor'
+        WHEN UPPER(r.ProductName) LIKE '%CUP%'
+          OR UPPER(r.ProductName) LIKE '%MUG%'
+          OR UPPER(r.ProductName) LIKE '%PLATE%' THEN 'Kitchen'
+        WHEN UPPER(r.ProductName) LIKE '%BOX%'
+          OR UPPER(r.ProductName) LIKE '%TIN%' THEN 'Storage'
+        ELSE 'Other'
+    END AS ProductCategory,
+
+    CASE
+        WHEN LEFT(LTRIM(RTRIM(r.TransactionNo)), 1) = 'C' OR ca.Quantity < 0 THEN 'Anulowanie / zwrot'
+        WHEN ca.UnitPrice = 0 THEN 'Transakcja bez ceny'
+        WHEN ca.CustomerNo IS NULL THEN 'Sprzedaż bez klienta'
+        ELSE 'Sprzedaż'
+    END AS TransactionType,
+
+    CASE
+        WHEN ca.TransactionDate IS NULL THEN 'Błąd daty'
+        WHEN ca.UnitPrice IS NULL THEN 'Błąd ceny'
+        WHEN ca.Quantity IS NULL THEN 'Błąd ilości'
+        WHEN ca.CustomerNo IS NULL THEN 'Brak klienta'
+        WHEN r.ProductName IS NULL OR LTRIM(RTRIM(r.ProductName)) = '' THEN 'Brak opisu produktu'
+        ELSE 'OK'
+    END AS DataQualityFlag
+
+FROM [HD_04].[dbo].[combined_sales_deduplicated] r
+CROSS APPLY
+(
+    SELECT
+        COALESCE
+        (
+            TRY_CONVERT(DATETIME2(0), NULLIF(LTRIM(RTRIM(r.TransactionDate)), ''), 23),
+            TRY_CONVERT(DATETIME2(0), NULLIF(LTRIM(RTRIM(r.TransactionDate)), ''), 120),
+            TRY_CONVERT(DATETIME2(0), NULLIF(LTRIM(RTRIM(r.TransactionDate)), ''), 101),
+            TRY_CONVERT(DATETIME2(0), NULLIF(LTRIM(RTRIM(r.TransactionDate)), ''))
+        ) AS TransactionDate,
+
+        TRY_CONVERT
+        (
+            DECIMAL(10,2),
+            REPLACE(NULLIF(LTRIM(RTRIM(r.UnitPrice)), ''), ',', '.')
+        ) AS UnitPrice,
+
+        TRY_CONVERT
+        (
+            INT,
+            NULLIF(LTRIM(RTRIM(r.Quantity)), '')
+        ) AS Quantity,
+
+        TRY_CONVERT
+        (
+            INT,
+            TRY_CONVERT
+            (
+                DECIMAL(18,2),
+                REPLACE(NULLIF(NULLIF(LTRIM(RTRIM(r.CustomerNo)), ''), 'NA'), ',', '.')
+            )
+        ) AS CustomerNo
+) ca
+WHERE
+    NULLIF(LTRIM(RTRIM(r.TransactionNo)), '') IS NOT NULL
+    AND LTRIM(RTRIM(r.TransactionNo)) <> 'TransactionNo';
+GO

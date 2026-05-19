@@ -1,0 +1,199 @@
+DROP TABLE IF EXISTS [HD_04].[dbo].[FactSales];
+
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimDate];
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimProduct];
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimCustomer];
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimCountry];
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimTransactionType];
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimDataQuality];
+DROP TABLE IF EXISTS [HD_04].[dbo].[DimSource];
+
+
+CREATE TABLE [HD_04].[dbo].[DimDate]
+(
+    DateKey INT PRIMARY KEY,
+    FullDate DATE NOT NULL,
+    DayNumber INT NOT NULL,
+    MonthNumber INT NOT NULL,
+    MonthName NVARCHAR(20) NOT NULL,
+    QuarterNumber INT NOT NULL,
+    YearNumber INT NOT NULL,
+    IsWeekend BIT NOT NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimDate]
+(
+    DateKey,
+    FullDate,
+    DayNumber,
+    MonthNumber,
+    MonthName,
+    QuarterNumber,
+    YearNumber,
+    IsWeekend
+)
+SELECT
+    DateKey,
+    CAST(MIN(TransactionDate) AS DATE) AS FullDate,
+    DAY(MIN(TransactionDate)) AS DayNumber,
+    MONTH(MIN(TransactionDate)) AS MonthNumber,
+    DATENAME(MONTH, MIN(TransactionDate)) AS MonthName,
+    DATEPART(QUARTER, MIN(TransactionDate)) AS QuarterNumber,
+    YEAR(MIN(TransactionDate)) AS YearNumber,
+    CAST(MAX(CAST(IsWeekend AS INT)) AS BIT) AS IsWeekend
+FROM [HD_04].[dbo].[SalesClean]
+WHERE DateKey IS NOT NULL
+GROUP BY DateKey;
+
+
+CREATE TABLE [HD_04].[dbo].[DimProduct]
+(
+    ProductKey INT IDENTITY(1,1) PRIMARY KEY,
+    ProductNo VARCHAR(30) NULL,
+    ProductName NVARCHAR(200) NULL,
+    ProductCategory NVARCHAR(60) NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimProduct]
+(
+    ProductNo,
+    ProductName,
+    ProductCategory
+)
+SELECT DISTINCT
+    ProductNo,
+    ProductName,
+    ProductCategory
+FROM [HD_04].[dbo].[SalesClean]
+WHERE ProductNo IS NOT NULL
+   OR ProductName IS NOT NULL;
+
+
+CREATE TABLE [HD_04].[dbo].[DimCustomer]
+(
+    CustomerKey INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerNo INT NULL,
+    IsCustomerKnown BIT NOT NULL,
+    CustomerType NVARCHAR(30) NOT NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimCustomer]
+(
+    CustomerNo,
+    IsCustomerKnown,
+    CustomerType
+)
+SELECT DISTINCT
+    CustomerNo,
+    IsCustomerKnown,
+    CASE
+        WHEN IsCustomerKnown = 1 THEN 'Znany klient'
+        ELSE 'Brak klienta'
+    END AS CustomerType
+FROM [HD_04].[dbo].[SalesClean];
+
+
+CREATE TABLE [HD_04].[dbo].[DimCountry]
+(
+    CountryKey INT IDENTITY(1,1) PRIMARY KEY,
+    Country NVARCHAR(80) NULL,
+    CountryGroup NVARCHAR(30) NULL,
+    IsUnitedKingdom BIT NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimCountry]
+(
+    Country,
+    CountryGroup,
+    IsUnitedKingdom
+)
+SELECT DISTINCT
+    Country,
+    CountryGroup,
+    IsUnitedKingdom
+FROM [HD_04].[dbo].[SalesClean];
+
+
+CREATE TABLE [HD_04].[dbo].[DimTransactionType]
+(
+    TransactionTypeKey INT IDENTITY(1,1) PRIMARY KEY,
+    TransactionType NVARCHAR(40) NULL,
+    IsCancelled BIT NULL,
+    IsReturn BIT NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimTransactionType]
+(
+    TransactionType,
+    IsCancelled,
+    IsReturn
+)
+SELECT DISTINCT
+    TransactionType,
+    IsCancelled,
+    IsReturn
+FROM [HD_04].[dbo].[SalesClean];
+
+
+CREATE TABLE [HD_04].[dbo].[DimDataQuality]
+(
+    DataQualityKey INT IDENTITY(1,1) PRIMARY KEY,
+    DataQualityFlag NVARCHAR(60) NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimDataQuality]
+(
+    DataQualityFlag
+)
+SELECT DISTINCT
+    DataQualityFlag
+FROM [HD_04].[dbo].[SalesClean];
+
+
+CREATE TABLE [HD_04].[dbo].[DimSource]
+(
+    SourceKey INT IDENTITY(1,1) PRIMARY KEY,
+    SourceDataset VARCHAR(50) NULL
+);
+
+INSERT INTO [HD_04].[dbo].[DimSource]
+(
+    SourceDataset
+)
+SELECT DISTINCT
+    SourceDataset
+FROM [HD_04].[dbo].[SalesClean];
+
+
+SELECT 'DimDate' AS TableName, COUNT(*) AS RowsCount
+FROM [HD_04].[dbo].[DimDate]
+
+UNION ALL
+
+SELECT 'DimProduct', COUNT(*)
+FROM [HD_04].[dbo].[DimProduct]
+
+UNION ALL
+
+SELECT 'DimCustomer', COUNT(*)
+FROM [HD_04].[dbo].[DimCustomer]
+
+UNION ALL
+
+SELECT 'DimCountry', COUNT(*)
+FROM [HD_04].[dbo].[DimCountry]
+
+UNION ALL
+
+SELECT 'DimTransactionType', COUNT(*)
+FROM [HD_04].[dbo].[DimTransactionType]
+
+UNION ALL
+
+SELECT 'DimDataQuality', COUNT(*)
+FROM [HD_04].[dbo].[DimDataQuality]
+
+UNION ALL
+
+SELECT 'DimSource', COUNT(*)
+FROM [HD_04].[dbo].[DimSource];

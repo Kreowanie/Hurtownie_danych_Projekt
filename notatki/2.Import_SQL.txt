@@ -1,0 +1,45 @@
+USE HD_04;
+GO
+
+
+1. Utworzenie czystej tabeli z poprawnymi typami
+CREATE TABLE [HD_04].[dbo].[SalesClean]
+(
+    SalesID INT IDENTITY(1,1) PRIMARY KEY,
+
+    SourceDataset VARCHAR(50) NULL,
+
+    TransactionNo VARCHAR(30) NULL,
+    TransactionDate DATETIME2(0) NULL,
+    DateKey INT NULL,
+
+    ProductNo VARCHAR(30) NULL,
+    ProductName NVARCHAR(200) NULL,
+
+    UnitPrice DECIMAL(10,2) NULL,
+    Quantity INT NULL,
+    CustomerNo INT NULL,
+    Country NVARCHAR(80) NULL,
+
+    LineAmount DECIMAL(19,2) NULL,
+    AbsLineAmount DECIMAL(19,2) NULL,
+
+    SalesYear INT NULL,
+    SalesMonth INT NULL,
+    SalesQuarter INT NULL,
+    SalesDay INT NULL,
+
+    IsCancelled BIT NULL,
+    IsReturn BIT NULL,
+    IsCustomerKnown BIT NULL,
+    IsUnitedKingdom BIT NULL,
+    IsWeekend BIT NULL,
+
+    CountryGroup NVARCHAR(30) NULL,
+    PriceBand NVARCHAR(30) NULL,
+    QuantityBand NVARCHAR(40) NULL,
+    ProductCategory NVARCHAR(60) NULL,
+    TransactionType NVARCHAR(40) NULL,
+    DataQualityFlag NVARCHAR(60) NULL
+);
+GO

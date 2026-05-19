@@ -1,0 +1,51 @@
+notatnik
+
+dodanie testu
+
+USE master;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM sys.sql_logins WHERE name = 'test01'
+)
+BEGIN
+    CREATE LOGIN test01
+    WITH PASSWORD = 'test01',
+    CHECK_POLICY = OFF,
+    CHECK_EXPIRATION = OFF;
+END
+ELSE
+BEGIN
+    ALTER LOGIN test01 ENABLE;
+    ALTER LOGIN test01
+    WITH PASSWORD = 'test01',
+    CHECK_POLICY = OFF,
+    CHECK_EXPIRATION = OFF;
+END
+GO
+
+USE HD_01;
+GO
+
+IF NOT EXISTS (
+    SELECT * FROM sys.database_principals WHERE name = 'test01'
+)
+BEGIN
+    CREATE USER test01 FOR LOGIN test01;
+END
+ELSE
+BEGIN
+    ALTER USER test01 WITH LOGIN = test01;
+END
+GO
+
+-- zabierz właściciela bazy, jeśli przypadkiem miał
+IF IS_ROLEMEMBER('db_owner', 'test01') = 1
+BEGIN
+    ALTER ROLE db_owner DROP MEMBER test01;
+END
+GO
+
+-- daj tylko odczyt
+ALTER ROLE db_datareader ADD MEMBER test01;
+GO
