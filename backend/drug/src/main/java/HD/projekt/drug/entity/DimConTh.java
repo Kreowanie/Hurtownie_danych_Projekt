@@ -3,8 +3,8 @@ package HD.projekt.drug.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "DimConType", schema = "dbo")
-public class DimConType {
+@Table(name = "DimConTh", schema = "dbo")
+public class DimConTh {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,10 +14,10 @@ public class DimConType {
     @Column(name = "dimName")
     private String dimName;
 
-    public DimConType() {
+    public DimConTh() {
     }
 
-    public DimConType(final String dimName) {
+    public DimConTh(final String dimName) {
         this.dimName = dimName;
     }
 

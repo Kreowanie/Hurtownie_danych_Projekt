@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "DimDrug", schema = "dbo")
 public class DimDrug {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -15,11 +14,18 @@ public class DimDrug {
     @Column(name = "dimName")
     private String dimName;
 
-    public DimDrug(
+    public DimDrug() {
+    }
 
-            final String dimName
-
-    ) {
+    public DimDrug(final String dimName) {
         this.dimName = dimName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getDimName() {
+        return dimName;
     }
 }
