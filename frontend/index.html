@@ -2,117 +2,588 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Miasta i typy</title>
+    <title>Drug Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background: #f5f5f5;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        h1 {
-            color: #333;
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                    radial-gradient(circle at top left, #3b82f6 0, transparent 35%),
+                    radial-gradient(circle at bottom right, #9333ea 0, transparent 35%),
+                    #0f172a;
+            color: #e5e7eb;
+            padding: 30px;
+        }
+
+        .app {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .hero-title h1 {
+            font-size: 42px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #38bdf8, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title p {
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        .status-box {
+            padding: 16px 22px;
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(14px);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 15px #22c55e;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .carousel {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 4px 22px;
+        }
+
+        .carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .carousel::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 999px;
+        }
+
+        .card {
+            min-width: 220px;
+            padding: 22px;
+            border-radius: 26px;
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            cursor: pointer;
+            transition: 0.25s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+        }
+
+        .card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: #38bdf8;
+            box-shadow: 0 25px 70px rgba(56, 189, 248, 0.2);
+        }
+
+        .card.active {
+            border-color: #a78bfa;
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.35), rgba(147, 51, 234, 0.35));
+        }
+
+        .card-icon {
+            font-size: 34px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .count {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.15);
+            color: #7dd3fc;
+            font-size: 13px;
+        }
+
+        .carousel-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            border: none;
+            padding: 11px 17px;
+            border-radius: 14px;
+            color: white;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        .panel {
+            background: rgba(15, 23, 42, 0.84);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(15px);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .panel-title h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .panel-title span {
+            color: #94a3b8;
+        }
+
+        .search-box {
+            min-width: 300px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(2, 6, 23, 0.7);
+            color: white;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .search-box:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
         }
 
         table {
+            width: 100%;
             border-collapse: collapse;
-            width: 500px;
-            background: white;
-            margin-bottom: 40px;
+            min-width: 700px;
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
+        thead {
+            background: rgba(30, 41, 59, 0.95);
         }
 
         th {
-            background: #eee;
+            text-align: left;
+            padding: 16px;
+            color: #bae6fd;
+            font-size: 14px;
+            letter-spacing: 0.4px;
         }
 
-        button {
-            padding: 10px 15px;
-            margin-bottom: 20px;
-            cursor: pointer;
+        td {
+            padding: 15px 16px;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            color: #e5e7eb;
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .empty, .loading, .error {
+            padding: 35px;
+            text-align: center;
+            color: #cbd5e1;
+        }
+
+        .error {
+            color: #fca5a5;
+        }
+
+        .footer-info {
+            margin-top: 18px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .highlight {
+            color: #67e8f9;
+            font-weight: bold;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 18px;
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-title h1 {
+                font-size: 32px;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
+<div class="app">
 
-<h1>Miasta</h1>
+    <section class="hero">
+        <div class="hero-title">
+            <h1>Drug Data Dashboard</h1>
+            <p>Interaktywny panel danych z hurtowni SQL Server + Spring Boot</p>
+        </div>
 
-<button onclick="pobierzMiasta()">Pobierz miasta</button>
+        <div class="status-box">
+            <span class="status-dot"></span>
+            Backend: <strong>Spring Boot 8088</strong>
+        </div>
+    </section>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nazwa</th>
-    </tr>
-    </thead>
-    <tbody id="miastaTabela">
-    </tbody>
-</table>
+    <div class="carousel-buttons">
+        <button class="btn" onclick="scrollCarousel(-1)">← Poprzednie</button>
+        <button class="btn" onclick="scrollCarousel(1)">Następne →</button>
+        <button class="btn" onclick="reloadCurrent()">Odśwież dane</button>
+    </div>
 
-<h1>Typy</h1>
+    <section class="carousel-wrapper">
+        <div class="carousel" id="carousel"></div>
+    </section>
 
-<button onclick="pobierzTypy()">Pobierz typy</button>
+    <section class="panel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <h2 id="tableTitle">Ładowanie...</h2>
+                <span id="tableDescription">Wybierz tabelę z karuzeli</span>
+            </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nazwa</th>
-    </tr>
-    </thead>
-    <tbody id="typyTabela">
-    </tbody>
-</table>
+            <input
+                    class="search-box"
+                    type="text"
+                    id="searchInput"
+                    placeholder="Szukaj w aktualnej tabeli..."
+                    oninput="renderTable()"
+            >
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="footer-info" id="footerInfo"></div>
+    </section>
+
+</div>
 
 <script>
-    function pobierzMiasta() {
-        fetch('/miasta')
-            .then(response => response.json())
-            .then(data => {
-                const tabela = document.getElementById('miastaTabela');
-                tabela.innerHTML = '';
+    const API_BASE = "";
 
-                data.forEach(miasto => {
-                    tabela.innerHTML += `
-                        <tr>
-                            <td>${miasto.id}</td>
-                            <td>${miasto.dimName}</td>
-                        </tr>
-                    `;
-                });
-            })
-            .catch(error => {
-                console.error('Błąd pobierania miast:', error);
-            });
+    const tables = [
+        {
+            key: "cities",
+            title: "Miasta",
+            description: "Tabela DimCity",
+            endpoint: "/miasta",
+            icon: "🏙️"
+        },
+        {
+            key: "conTypes",
+            title: "Typy warunków",
+            description: "Tabela dimConTh / DimConType",
+            endpoint: "/typy",
+            icon: "🧩"
+        },
+        {
+            key: "drugs",
+            title: "Leki",
+            description: "Tabela DimDrug",
+            endpoint: "/leki",
+            icon: "💊"
+        },
+        {
+            key: "drugTypes",
+            title: "Typy leków",
+            description: "Tabela DimDrugType",
+            endpoint: "/typleku",
+            icon: "🧪"
+        },
+        {
+            key: "manufacturers",
+            title: "Producenci",
+            description: "Tabela DimMan",
+            endpoint: "/man",
+            icon: "🏭"
+        },
+        {
+            key: "time",
+            title: "Czas",
+            description: "Tabela dimTime",
+            endpoint: "/czas",
+            icon: "📅"
+        },
+        {
+            key: "facts",
+            title: "Fakty",
+            description: "Tabela FactDrug",
+            endpoint: "/fakty",
+            icon: "📊"
+        }
+    ];
+
+    let activeTable = tables[0];
+    let cache = {};
+    let currentData = [];
+
+    const carousel = document.getElementById("carousel");
+    const tableTitle = document.getElementById("tableTitle");
+    const tableDescription = document.getElementById("tableDescription");
+    const tableHead = document.getElementById("tableHead");
+    const tableBody = document.getElementById("tableBody");
+    const footerInfo = document.getElementById("footerInfo");
+    const searchInput = document.getElementById("searchInput");
+
+    function createCarousel() {
+        carousel.innerHTML = "";
+
+        tables.forEach(table => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.id = `card-${table.key}`;
+            card.onclick = () => selectTable(table.key);
+
+            card.innerHTML = `
+                <div class="card-icon">${table.icon}</div>
+                <h3>${table.title}</h3>
+                <p>${table.description}</p>
+                <span class="count" id="count-${table.key}">Ładowanie...</span>
+            `;
+
+            carousel.appendChild(card);
+        });
     }
 
-    function pobierzTypy() {
-        fetch('/typy')
-            .then(response => response.json())
-            .then(data => {
-                const tabela = document.getElementById('typyTabela');
-                tabela.innerHTML = '';
+    function setActiveCard() {
+        document.querySelectorAll(".card").forEach(card => {
+            card.classList.remove("active");
+        });
 
-                data.forEach(typ => {
-                    tabela.innerHTML += `
-                        <tr>
-                            <td>${typ.id}</td>
-                            <td>${typ.dimName}</td>
-                        </tr>
-                    `;
-                });
-            })
-            .catch(error => {
-                console.error('Błąd pobierania typów:', error);
-            });
+        const activeCard = document.getElementById(`card-${activeTable.key}`);
+        if (activeCard) {
+            activeCard.classList.add("active");
+        }
     }
+
+    async function selectTable(key) {
+        activeTable = tables.find(table => table.key === key);
+        searchInput.value = "";
+        setActiveCard();
+
+        tableTitle.textContent = activeTable.title;
+        tableDescription.textContent = `${activeTable.description} • ${activeTable.endpoint}`;
+
+        await loadData(activeTable);
+        renderTable();
+    }
+
+    async function loadData(table) {
+        tableBody.innerHTML = `<tr><td class="loading" colspan="20">Ładowanie danych...</td></tr>`;
+        tableHead.innerHTML = "";
+        footerInfo.textContent = "";
+
+        try {
+            if (!cache[table.key]) {
+                const response = await fetch(API_BASE + table.endpoint);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                cache[table.key] = await response.json();
+            }
+
+            currentData = cache[table.key];
+
+            const countElement = document.getElementById(`count-${table.key}`);
+            if (countElement) {
+                countElement.textContent = `${currentData.length} rekordów`;
+            }
+
+        } catch (error) {
+            currentData = [];
+            tableHead.innerHTML = "";
+            tableBody.innerHTML = `
+                <tr>
+                    <td class="error" colspan="20">
+                        Nie udało się pobrać danych z endpointu ${table.endpoint}.<br>
+                        Szczegóły: ${error.message}
+                    </td>
+                </tr>
+            `;
+
+            const countElement = document.getElementById(`count-${table.key}`);
+            if (countElement) {
+                countElement.textContent = "Błąd";
+            }
+        }
+    }
+
+    function renderTable() {
+        const query = searchInput.value.toLowerCase().trim();
+
+        const filteredData = currentData.filter(row => {
+            return Object.values(row).some(value =>
+                String(value ?? "").toLowerCase().includes(query)
+            );
+        });
+
+        if (!filteredData.length) {
+            tableHead.innerHTML = "";
+            tableBody.innerHTML = `
+                <tr>
+                    <td class="empty" colspan="20">
+                        Brak danych do wyświetlenia
+                    </td>
+                </tr>
+            `;
+            footerInfo.innerHTML = `Wyniki: <span class="highlight">0</span>`;
+            return;
+        }
+
+        const columns = Object.keys(filteredData[0]);
+
+        tableHead.innerHTML = `
+            <tr>
+                ${columns.map(column => `<th>${column}</th>`).join("")}
+            </tr>
+        `;
+
+        tableBody.innerHTML = filteredData.map(row => `
+            <tr>
+                ${columns.map(column => `<td>${formatValue(row[column])}</td>`).join("")}
+            </tr>
+        `).join("");
+
+        footerInfo.innerHTML = `
+            Wyświetlono <span class="highlight">${filteredData.length}</span>
+            z <span class="highlight">${currentData.length}</span> rekordów.
+        `;
+    }
+
+    function formatValue(value) {
+        if (value === null || value === undefined) {
+            return "<span style='color:#64748b'>NULL</span>";
+        }
+
+        if (typeof value === "boolean") {
+            return value ? "Tak" : "Nie";
+        }
+
+        return String(value);
+    }
+
+    function scrollCarousel(direction) {
+        carousel.scrollBy({
+            left: direction * 280,
+            behavior: "smooth"
+        });
+    }
+
+    async function reloadCurrent() {
+        delete cache[activeTable.key];
+        await loadData(activeTable);
+        renderTable();
+    }
+
+    async function preloadCounts() {
+        for (const table of tables) {
+            try {
+                const response = await fetch(API_BASE + table.endpoint);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                cache[table.key] = data;
+
+                const countElement = document.getElementById(`count-${table.key}`);
+                if (countElement) {
+                    countElement.textContent = `${data.length} rekordów`;
+                }
+            } catch {
+                const countElement = document.getElementById(`count-${table.key}`);
+                if (countElement) {
+                    countElement.textContent = "Błąd";
+                }
+            }
+        }
+    }
+
+    createCarousel();
+    setActiveCard();
+    selectTable(activeTable.key);
+    preloadCounts();
 </script>
-
 </body>
 </html>

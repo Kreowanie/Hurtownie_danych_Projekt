@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Miasta i typy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 500px;
+            background: white;
+            margin-bottom: 40px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Miasta</h1>
+
+<button onclick="pobierzMiasta()">Pobierz miasta</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nazwa</th>
+    </tr>
+    </thead>
+    <tbody id="miastaTabela">
+    </tbody>
+</table>
+
+<h1>Typy</h1>
+
+<button onclick="pobierzTypy()">Pobierz typy</button>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nazwa</th>
+    </tr>
+    </thead>
+    <tbody id="typyTabela">
+    </tbody>
+</table>
+
+<script>
+    function pobierzMiasta() {
+        fetch('/miasta')
+            .then(response => response.json())
+            .then(data => {
+                const tabela = document.getElementById('miastaTabela');
+                tabela.innerHTML = '';
+
+                data.forEach(miasto => {
+                    tabela.innerHTML += `
+                        <tr>
+                            <td>${miasto.id}</td>
+                            <td>${miasto.dimName}</td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error('Błąd pobierania miast:', error);
+            });
+    }
+
+    function pobierzTypy() {
+        fetch('/typy')
+            .then(response => response.json())
+            .then(data => {
+                const tabela = document.getElementById('typyTabela');
+                tabela.innerHTML = '';
+
+                data.forEach(typ => {
+                    tabela.innerHTML += `
+                        <tr>
+                            <td>${typ.id}</td>
+                            <td>${typ.dimName}</td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error('Błąd pobierania typów:', error);
+            });
+    }
+</script>
+
+</body>
+</html>

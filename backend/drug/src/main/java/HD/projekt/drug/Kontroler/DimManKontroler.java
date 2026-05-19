@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Man")
+@RequestMapping("/man")
 public class DimManKontroler {
     private final DimManRepository dimManRepository;
 

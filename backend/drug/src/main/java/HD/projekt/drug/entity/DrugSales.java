@@ -3,7 +3,7 @@ package HD.projekt.drug.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "DrugSales", schema = "dbo")
+@Table(name = "drugSales", schema = "dbo")
 public class DrugSales {
 
 
@@ -22,6 +22,14 @@ public class DrugSales {
 
     ) {
         this.dimName = dimName;
+    }
+
+    public Long getId(){
+        return id;
+    }
+
+    public  String getName(){
+        return  dimName;
     }
 }
 

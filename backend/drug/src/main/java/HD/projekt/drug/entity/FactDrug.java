@@ -3,75 +3,130 @@ package HD.projekt.drug.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "FactDrug", schema = "dbo")
+@Table(name = "factDrug", schema = "dbo")
 public class FactDrug {
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "dimTime_id")
-    private int dimTime_id;
+    @Column(name = "dimCity_id")
+    private Integer dimCityId;
 
-    @Column(name = "dimMan_id")
-    private int dimMan_id;
+    @Column(name = "dimConTh_id")
+    private Integer dimConThId;
 
     @Column(name = "dimDrug_id")
-    private int dimDrug_id;
+    private Integer dimDrugId;
 
-    @Column(name = "dimConType_id")
-    private int dimConType_id;
+    @Column(name = "dimDrugType_id")
+    private Integer dimDrugTypeId;
 
-    @Column(name = "dimCity_id")
-    private int dimCity_id;
+    @Column(name = "dimMan_id")
+    private Integer dimManId;
 
-    @Column(name = "Is_Refunded")
-    private  float Is_Refunded;
+    @Column(name = "dimTime_id")
+    private Integer dimTimeId;
 
-    @Column(name = "fctCtn")
-    private int fctCtn;
+    @Column(name = "is_refunded")
+    private Boolean refunded;
 
-    @Column(name = "fctSum")
-    private int fctSum;
+    @Column(name = "cntDrug")
+    private Integer cntDrug;
 
-    @Column(name = "fctAvg")
-    private int fctAvg;
+    @Column(name = "sumDrug")
+    private Double sumDrug;
 
-    @Column(name = "fctMin")
-    private int fctMin;
+    @Column(name = "avgDrug")
+    private Double avgDrug;
 
-    @Column(name = "fctMax")
-    private int fctMax;
+    @Column(name = "minDrug")
+    private Double minDrug;
 
+    @Column(name = "maxDrug")
+    private Double maxDrug;
+
+    public FactDrug() {
+    }
 
     public FactDrug(
-
-            final int dimTime_id,
-            final int dimMan_id,
-            final int dimDrug_id,
-            final int dimConType_id,
-            final int dimCity_id,
-            final float Is_Refunded,
-            final int fctCtn,
-            final int fctSum,
-            final int fctAvg,
-            final int fctMin,
-            final int fctMax
-
+            final Integer dimCityId,
+            final Integer dimConThId,
+            final Integer dimDrugId,
+            final Integer dimDrugTypeId,
+            final Integer dimManId,
+            final Integer dimTimeId,
+            final Boolean refunded,
+            final Integer cntDrug,
+            final Double sumDrug,
+            final Double avgDrug,
+            final Double minDrug,
+            final Double maxDrug
     ) {
-        this.dimTime_id = dimTime_id;
-        this.dimMan_id = dimMan_id;
-        this.dimDrug_id = dimDrug_id;
-        this.dimConType_id = dimConType_id;
-        this.dimCity_id = dimCity_id;
-        this.Is_Refunded = Is_Refunded;
-        this.fctCtn = fctCtn;
-        this.fctSum = fctSum;
-        this.fctAvg = fctAvg;
-        this.fctMin = fctMin;
-        this.fctMax = fctMax;
+        this.dimCityId = dimCityId;
+        this.dimConThId = dimConThId;
+        this.dimDrugId = dimDrugId;
+        this.dimDrugTypeId = dimDrugTypeId;
+        this.dimManId = dimManId;
+        this.dimTimeId = dimTimeId;
+        this.refunded = refunded;
+        this.cntDrug = cntDrug;
+        this.sumDrug = sumDrug;
+        this.avgDrug = avgDrug;
+        this.minDrug = minDrug;
+        this.maxDrug = maxDrug;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Integer getDimCityId() {
+        return dimCityId;
+    }
+
+    public Integer getDimConThId() {
+        return dimConThId;
+    }
+
+    public Integer getDimDrugId() {
+        return dimDrugId;
+    }
+
+    public Integer getDimDrugTypeId() {
+        return dimDrugTypeId;
+    }
+
+    public Integer getDimManId() {
+        return dimManId;
+    }
+
+    public Integer getDimTimeId() {
+        return dimTimeId;
+    }
+
+    public Boolean getRefunded() {
+        return refunded;
+    }
+
+    public Integer getCntDrug() {
+        return cntDrug;
+    }
+
+    public Double getSumDrug() {
+        return sumDrug;
+    }
+
+    public Double getAvgDrug() {
+        return avgDrug;
+    }
+
+    public Double getMinDrug() {
+        return minDrug;
+    }
+
+    public Double getMaxDrug() {
+        return maxDrug;
     }
 }

@@ -1,5 +1,6 @@
 package HD.projekt.drug.Kontroler;
 
+//nie używany
 
 import HD.projekt.drug.Repozytorium.DrugSalesRepository;
 import HD.projekt.drug.entity.DrugSales;
