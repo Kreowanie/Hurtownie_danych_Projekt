@@ -6,7 +6,7 @@ spring:
     name: drug
 
   datasource:
-    url: 'jdbc:sqlserver://Kreo\SQLEXPRESS;databaseName=HD_02;encrypt=true;trustServerCertificate=true'
+    url: 'jdbc:sqlserver://Kreo\SQLEXPRESS;databaseName=HD_04;encrypt=true;trustServerCertificate=true'
     username: test01
     password: test01
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

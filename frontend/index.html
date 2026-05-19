@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Drug Dashboard</title>
+    <title>Hurtownia danych Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -288,8 +288,8 @@
 
     <section class="hero">
         <div class="hero-title">
-            <h1>Drug Data Dashboard</h1>
-            <p>Interaktywny panel danych z hurtowni SQL Server + Spring Boot</p>
+            <h1>Hurtownia danych Dashboard</h1>
+            <p>Interaktywny panel wymiarów z hurtowni SQL Server + Spring Boot</p>
         </div>
 
         <div class="status-box">
@@ -341,53 +341,53 @@
 
     const tables = [
         {
-            key: "cities",
-            title: "Miasta",
-            description: "Tabela DimCity",
-            endpoint: "/miasta",
-            icon: "🏙️"
-        },
-        {
-            key: "conTypes",
-            title: "Typy warunków",
-            description: "Tabela dimConTh / DimConType",
-            endpoint: "/typy",
-            icon: "🧩"
-        },
-        {
-            key: "drugs",
-            title: "Leki",
-            description: "Tabela DimDrug",
-            endpoint: "/leki",
-            icon: "💊"
-        },
-        {
-            key: "drugTypes",
-            title: "Typy leków",
-            description: "Tabela DimDrugType",
-            endpoint: "/typleku",
-            icon: "🧪"
-        },
-        {
-            key: "manufacturers",
-            title: "Producenci",
-            description: "Tabela DimMan",
-            endpoint: "/man",
-            icon: "🏭"
-        },
-        {
-            key: "time",
-            title: "Czas",
-            description: "Tabela dimTime",
-            endpoint: "/czas",
+            key: "data",
+            title: "Data",
+            description: "Tabela DimDate",
+            endpoint: "/data",
             icon: "📅"
         },
         {
-            key: "facts",
-            title: "Fakty",
-            description: "Tabela FactDrug",
-            endpoint: "/fakty",
-            icon: "📊"
+            key: "jakosc",
+            title: "Jakość danych",
+            description: "Tabela DimDataQuality",
+            endpoint: "/jakosc",
+            icon: "✅"
+        },
+        {
+            key: "produkt",
+            title: "Produkty",
+            description: "Tabela DimProduct",
+            endpoint: "/produkt",
+            icon: "📦"
+        },
+        {
+            key: "klient",
+            title: "Klienci",
+            description: "Tabela DimCustomer",
+            endpoint: "/klient",
+            icon: "👤"
+        },
+        {
+            key: "kraj",
+            title: "Kraje",
+            description: "Tabela DimCountry",
+            endpoint: "/kraj",
+            icon: "🌍"
+        },
+        {
+            key: "zrodlo",
+            title: "Źródła",
+            description: "Tabela DimSource",
+            endpoint: "/zrodlo",
+            icon: "🗂️"
+        },
+        {
+            key: "transakcje",
+            title: "Typy transakcji",
+            description: "Tabela DimTransactionType",
+            endpoint: "/transakcje",
+            icon: "🔁"
         }
     ];
 
