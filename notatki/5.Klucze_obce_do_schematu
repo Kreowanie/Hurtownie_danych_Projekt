@@ -1,0 +1,159 @@
+USE HD_04;
+go
+ALTER TABLE dbo.SalesClean ADD ProductKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD CustomerKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD CountryKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD TransactionTypeKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD DataQualityKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD SourceKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD DateKey_id INT NULL;
+
+go
+
+
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([ProductKey_id])
+REFERENCES [dbo].[DimProduct] ([ProductKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([CustomerKey_id])
+REFERENCES [dbo].[DimCustomer] ([CustomerKey])
+GO
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([CountryKey_id])
+REFERENCES [dbo].[DimCountry] ([CountryKey])
+GO
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([TransactionTypeKey_id])
+REFERENCES [dbo].[DimTransactionType] ([TransactionTypeKey])
+GO
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([DataQualityKey_id])
+REFERENCES [dbo].[DimDataQuality] ([DataQualityKey])
+GO
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([SourceKey_id])
+REFERENCES [dbo].[DimSource] ([SourceKey])
+GO
+
+
+ALTER TABLE [dbo].[SalesClean]  WITH CHECK ADD FOREIGN KEY([DateKey_id])
+REFERENCES [dbo].[DimDate] ([DateKey])
+GO
+
+===============================
+============================================================================================================================
+===============================
+USE HD_04;
+GO
+
+ALTER TABLE dbo.SalesClean ADD ProductKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD CustomerKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD CountryKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD TransactionTypeKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD DataQualityKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD SourceKey_id INT NULL;
+ALTER TABLE dbo.SalesClean ADD DateKey_id INT NULL;
+
+GO
+
+
+-- UPDATE ProductKey_id
+UPDATE sc
+SET sc.ProductKey_id = dp.ProductKey
+FROM dbo.SalesClean sc
+LEFT JOIN dbo.DimProduct dp
+    ON ISNULL(sc.ProductNo, '') = ISNULL(dp.ProductNo, '')
+   AND ISNULL(sc.ProductName, '') = ISNULL(dp.ProductName, '')
+   AND ISNULL(sc.ProductCategory, '') = ISNULL(dp.ProductCategory, '');
+
+GO
+
+
+-- UPDATE CustomerKey_id
+UPDATE sc
+SET sc.CustomerKey_id = dc.CustomerKey
+FROM dbo.SalesClean sc
+LEFT JOIN dbo.DimCustomer dc
+    ON ISNULL(sc.CustomerNo, -1) = ISNULL(dc.CustomerNo, -1)
+   AND ISNULL(sc.IsCustomerKnown, 0) = ISNULL(dc.IsCustomerKnown, 0);
+
+GO
+
+
+-- UPDATE CountryKey_id
+UPDATE sc
+SET sc.CountryKey_id = dco.CountryKey
+FROM dbo.SalesClean sc
+LEFT JOIN dbo.DimCountry dco
+    ON ISNULL(sc.Country, '') = ISNULL(dco.Country, '')
+   AND ISNULL(sc.CountryGroup, '') = ISNULL(dco.CountryGroup, '')
+   AND ISNULL(sc.IsUnitedKingdom, 0) = ISNULL(dco.IsUnitedKingdom, 0);
+
+GO
+
+
+-- UPDATE TransactionTypeKey_id
+UPDATE sc
+SET sc.TransactionTypeKey_id = dtt.TransactionTypeKey
+FROM dbo.SalesClean sc
+LEFT JOIN dbo.DimTransactionType dtt
+    ON ISNULL(sc.TransactionType, '') = ISNULL(dtt.TransactionType, '')
+   AND ISNULL(sc.IsCancelled, 0) = ISNULL(dtt.IsCancelled, 0)
+   AND ISNULL(sc.IsReturn, 0) = ISNULL(dtt.IsReturn, 0);
+
+GO
+
+
+-- UPDATE DataQualityKey_id
+UPDATE sc
+SET sc.DataQualityKey_id = dq.DataQualityKey
+FROM dbo.SalesClean sc
+LEFT JOIN dbo.DimDataQuality dq
+    ON ISNULL(sc.DataQualityFlag, '') = ISNULL(dq.DataQualityFlag, '');
+
+GO
+
+
+-- UPDATE SourceKey_id
+UPDATE sc
+SET sc.SourceKey_id = ds.SourceKey
+FROM dbo.SalesClean sc
+LEFT JOIN dbo.DimSource ds
+    ON ISNULL(sc.SourceDataset, '') = ISNULL(ds.SourceDataset, '');
+
+GO
+
+
+-- UPDATE DateKey_id
+UPDATE sc
+SET sc.DateKey_id = sc.DateKey
+FROM dbo.SalesClean sc;
+
+GO
+
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([ProductKey_id])
+REFERENCES [dbo].[DimProduct] ([ProductKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([CustomerKey_id])
+REFERENCES [dbo].[DimCustomer] ([CustomerKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([CountryKey_id])
+REFERENCES [dbo].[DimCountry] ([CountryKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([TransactionTypeKey_id])
+REFERENCES [dbo].[DimTransactionType] ([TransactionTypeKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([DataQualityKey_id])
+REFERENCES [dbo].[DimDataQuality] ([DataQualityKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([SourceKey_id])
+REFERENCES [dbo].[DimSource] ([SourceKey])
+GO
+
+ALTER TABLE [dbo].[SalesClean] WITH CHECK ADD FOREIGN KEY([DateKey_id])
+REFERENCES [dbo].[DimDate] ([DateKey])
+GO
+
+
