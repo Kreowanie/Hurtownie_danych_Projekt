@@ -1,0 +1,213 @@
+
+
+
+	USE HD_04;
+    GO
+
+    CREATE OR ALTER PROCEDURE [dbo].[importCountry]
+    AS
+    BEGIN
+
+        INSERT INTO dbo.DimCountry
+        (
+            Country,
+            CountryGroup,
+            IsUnitedKingdom
+        )
+        SELECT DISTINCT
+            sc.Country,
+            sc.CountryGroup,
+            sc.IsUnitedKingdom
+        FROM dbo.SalesClean sc
+        LEFT JOIN dbo.DimCountry dc
+            ON ISNULL(dc.Country, '') = ISNULL(sc.Country, '')
+           AND ISNULL(dc.CountryGroup, '') = ISNULL(sc.CountryGroup, '')
+           AND ISNULL(dc.IsUnitedKingdom, 0) = ISNULL(sc.IsUnitedKingdom, 0)
+        WHERE dc.CountryKey IS NULL
+          AND sc.Country IS NOT NULL;
+
+    END;
+GO
+
+
+
+      CREATE OR ALTER PROCEDURE [dbo].[importCustomer]
+      AS
+      BEGIN
+
+          INSERT INTO dbo.DimCustomer
+          (
+              CustomerNo,
+              IsCustomerKnown,
+              CustomerType
+          )
+          SELECT DISTINCT
+              sc.CustomerNo,
+              sc.IsCustomerKnown,
+              CASE
+                  WHEN sc.IsCustomerKnown = 1 THEN N'Znany klient'
+                  ELSE N'Brak klienta'
+              END AS CustomerType
+          FROM dbo.SalesClean sc
+          LEFT JOIN dbo.DimCustomer dcus
+              ON ISNULL(dcus.CustomerNo, -1) = ISNULL(sc.CustomerNo, -1)
+             AND ISNULL(dcus.IsCustomerKnown, 0) = ISNULL(sc.IsCustomerKnown, 0)
+             AND ISNULL(dcus.CustomerType, '') = ISNULL(
+                  CASE
+                      WHEN sc.IsCustomerKnown = 1 THEN N'Znany klient'
+                      ELSE N'Brak klienta'
+                  END, ''
+             )
+          WHERE dcus.CustomerKey IS NULL;
+
+      END;
+      GO
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importDataQuality]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimDataQuality
+            (
+                DataQualityFlag
+            )
+            SELECT DISTINCT
+                sc.DataQualityFlag
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimDataQuality ddata
+                ON ISNULL(ddata.DataQualityFlag, '') = ISNULL(sc.DataQualityFlag, '')
+            WHERE ddata.DataQualityKey IS NULL
+              AND sc.DataQualityFlag IS NOT NULL;
+
+        END;
+        GO
+
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importDate]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimDate
+            (
+                DateKey,
+                FullDate,
+                DayNumber,
+                MonthNumber,
+                MonthName,
+                QuarterNumber,
+                YearNumber,
+                IsWeekend
+            )
+            SELECT DISTINCT
+                sc.DateKey,
+                CAST(sc.TransactionDate AS DATE) AS FullDate,
+                sc.SalesDay AS DayNumber,
+                sc.SalesMonth AS MonthNumber,
+                DATENAME(MONTH, sc.TransactionDate) AS MonthName,
+                sc.SalesQuarter AS QuarterNumber,
+                sc.SalesYear AS YearNumber,
+                sc.IsWeekend
+
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimDate ddate
+                ON ddate.DateKey = sc.DateKey
+            WHERE ddate.DateKey IS NULL
+              AND sc.DateKey IS NOT NULL
+              AND sc.TransactionDate IS NOT NULL;
+
+        END;
+        GO
+
+
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importProduct]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimProduct
+            (
+                ProductNo,
+                ProductName,
+                ProductCategory
+            )
+            SELECT DISTINCT
+                sc.ProductNo,
+                sc.ProductName,
+                sc.ProductCategory
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimProduct dpro
+                ON ISNULL(dpro.ProductNo, '') = ISNULL(sc.ProductNo, '')
+               AND ISNULL(dpro.ProductName, '') = ISNULL(sc.ProductName, '')
+               AND ISNULL(dpro.ProductCategory, '') = ISNULL(sc.ProductCategory, '')
+            WHERE dpro.ProductKey IS NULL
+              AND sc.ProductNo IS NOT NULL;
+
+        END;
+        GO
+
+
+
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importSource]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimSource
+            (
+                SourceDataset
+            )
+            SELECT DISTINCT
+                sc.SourceDataset
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimSource dsour
+                ON ISNULL(dsour.SourceDataset, '') = ISNULL(sc.SourceDataset, '')
+            WHERE dsour.SourceKey IS NULL
+              AND sc.SourceDataset IS NOT NULL;
+
+        END;
+        GO
+
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importTransactionType]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimTransactionType
+            (
+                TransactionType,
+                IsCancelled,
+                IsReturn
+            )
+            SELECT DISTINCT
+                sc.TransactionType,
+                sc.IsCancelled,
+                sc.IsReturn
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimTransactionType dtran
+                ON ISNULL(dtran.TransactionType, '') = ISNULL(sc.TransactionType, '')
+               AND ISNULL(dtran.IsCancelled, 0) = ISNULL(sc.IsCancelled, 0)
+               AND ISNULL(dtran.IsReturn, 0) = ISNULL(sc.IsReturn, 0)
+            WHERE dtran.TransactionTypeKey IS NULL
+              AND sc.TransactionType IS NOT NULL;
+
+        END;
+        GO
+
+
+EXEC dbo.importCountry;
+EXEC dbo.importCustomer;
+EXEC dbo.importDataQuality;
+EXEC dbo.importDate;
+EXEC dbo.importProduct;
+EXEC dbo.importSource;
+EXEC dbo.importTransactionType;
