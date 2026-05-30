@@ -1,33 +1,65 @@
 
 
 
-	USE HD_04;
-    GO
-
-    CREATE OR ALTER PROCEDURE [dbo].[importCountry]
-    AS
-    BEGIN
-
-        INSERT INTO dbo.DimCountry
-        (
-            Country,
-            CountryGroup,
-            IsUnitedKingdom
-        )
-        SELECT DISTINCT
-            sc.Country,
-            sc.CountryGroup,
-            sc.IsUnitedKingdom
-        FROM dbo.SalesClean sc
-        LEFT JOIN dbo.DimCountry dc
-            ON ISNULL(dc.Country, '') = ISNULL(sc.Country, '')
-           AND ISNULL(dc.CountryGroup, '') = ISNULL(sc.CountryGroup, '')
-           AND ISNULL(dc.IsUnitedKingdom, 0) = ISNULL(sc.IsUnitedKingdom, 0)
-        WHERE dc.CountryKey IS NULL
-          AND sc.Country IS NOT NULL;
-
-    END;
+USE HD_04;
 GO
+
+CREATE OR ALTER PROCEDURE dbo.importCountry
+AS
+BEGIN
+
+    WITH CleanCountry AS
+    (
+        SELECT DISTINCT
+            LTRIM(RTRIM(
+                CASE
+                    WHEN sc.Country LIKE '%,%'
+                    THEN RIGHT(sc.Country, CHARINDEX(',', REVERSE(sc.Country)) - 1)
+                    ELSE sc.Country
+                END
+            )) AS Country
+        FROM dbo.SalesClean sc
+        WHERE sc.Country IS NOT NULL
+    )
+    INSERT INTO dbo.DimCountry
+    (
+        Country,
+        CountryGroup,
+        IsUnitedKingdom
+    )
+    SELECT DISTINCT
+        cc.Country,
+        CASE
+            WHEN cc.Country = 'United Kingdom' THEN 'United Kingdom'
+            ELSE 'Export'
+        END AS CountryGroup,
+        CASE
+            WHEN cc.Country = 'United Kingdom' THEN 1
+            ELSE 0
+        END AS IsUnitedKingdom
+    FROM CleanCountry cc
+    LEFT JOIN dbo.DimCountry dc
+        ON ISNULL(dc.Country, '') = ISNULL(cc.Country, '')
+       AND ISNULL(dc.CountryGroup, '') = ISNULL(
+            CASE
+                WHEN cc.Country = 'United Kingdom' THEN 'United Kingdom'
+                ELSE 'Export'
+            END, ''
+       )
+       AND ISNULL(dc.IsUnitedKingdom, 0) = ISNULL(
+            CASE
+                WHEN cc.Country = 'United Kingdom' THEN 1
+                ELSE 0
+            END, 0
+       )
+    WHERE dc.CountryKey IS NULL
+      AND cc.Country IS NOT NULL
+      AND cc.Country <> '';
+
+END;
+GO
+
+
 
 
 
