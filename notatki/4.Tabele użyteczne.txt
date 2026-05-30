@@ -92,26 +92,54 @@ SELECT DISTINCT
     END AS CustomerType
 FROM [HD_04].[dbo].[SalesClean];
 
+ ===========================================================
 
-CREATE TABLE [HD_04].[dbo].[DimCountry]
-(
-    CountryKey INT IDENTITY(1,1) PRIMARY KEY,
-    Country NVARCHAR(80) NULL,
-    CountryGroup NVARCHAR(30) NULL,
-    IsUnitedKingdom BIT NULL
-);
 
-INSERT INTO [HD_04].[dbo].[DimCountry]
-(
-    Country,
-    CountryGroup,
-    IsUnitedKingdom
-)
-SELECT DISTINCT
-    Country,
-    CountryGroup,
-    IsUnitedKingdom
-FROM [HD_04].[dbo].[SalesClean];
+ CREATE TABLE [HD_04].[dbo].[DimCountry]
+ (
+     CountryKey INT IDENTITY(1,1) PRIMARY KEY,
+     Country NVARCHAR(80) NULL,
+     CountryGroup NVARCHAR(30) NULL,
+     IsUnitedKingdom BIT NULL
+ );
+ GO
+
+ WITH CleanCountry AS
+ (
+     SELECT DISTINCT
+         LTRIM(RTRIM(
+             CASE
+                 WHEN Country LIKE '%,%'
+                 THEN RIGHT(Country, CHARINDEX(',', REVERSE(Country)) - 1)
+                 ELSE Country
+             END
+         )) AS Country
+     FROM [HD_04].[dbo].[SalesClean]
+     WHERE Country IS NOT NULL
+ )
+ INSERT INTO [HD_04].[dbo].[DimCountry]
+ (
+     Country,
+     CountryGroup,
+     IsUnitedKingdom
+ )
+ SELECT DISTINCT
+     Country,
+     CASE
+         WHEN Country = N'United Kingdom' THEN N'United Kingdom'
+         ELSE N'Export'
+     END AS CountryGroup,
+     CASE
+         WHEN Country = N'United Kingdom' THEN 1
+         ELSE 0
+     END AS IsUnitedKingdom
+ FROM CleanCountry
+ WHERE Country IS NOT NULL
+   AND Country <> N'';
+ GO
+
+
+ ===========================
 
 
 CREATE TABLE [HD_04].[dbo].[DimTransactionType]
