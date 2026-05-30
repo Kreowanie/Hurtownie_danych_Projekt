@@ -1,6 +1,7 @@
 package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimProductRepository;
+import HD.projekt.drug.dto.DimProductDTO;
 import HD.projekt.drug.entity.DimProduct;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +21,8 @@ public class DimProductKontroler {
     }
 
        @GetMapping
-       public List<DimProduct> getAllProducts(){
-           return dimProductRepository.findAll();
+       public List<DimProductDTO> getAllProducts(){
+           return dimProductRepository.findAllProjectedOrderByIdDesc();
         }
     }
 

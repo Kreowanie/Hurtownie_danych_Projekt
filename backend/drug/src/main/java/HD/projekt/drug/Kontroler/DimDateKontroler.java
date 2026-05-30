@@ -1,6 +1,7 @@
 package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimDateRepository;
+import HD.projekt.drug.dto.DimDateDTO;
 import HD.projekt.drug.entity.DimDate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class DimDateKontroler {
     }
 
     @GetMapping
-    public List<DimDate> getAllDate() {
-        return dimDateRepository.findAll();
+    public List<DimDateDTO> getAllDate() {
+        return dimDateRepository.findAllProjectedOrderByIdDesc();
     }
 }

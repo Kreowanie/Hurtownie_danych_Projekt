@@ -1,7 +1,7 @@
 package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimCountryRepository;
-import HD.projekt.drug.entity.DimCountry;
+import HD.projekt.drug.dto.DimCountryDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +19,7 @@ public class DimCountryKontroler {
     }
 
     @GetMapping
-    public List<DimCountry> getAllKraje() {
-        return dimCountryRepository.findAll();
+    public List<DimCountryDTO> getAllKraje() {
+        return dimCountryRepository.findAllProjectedOrderByIdDesc();
     }
 }

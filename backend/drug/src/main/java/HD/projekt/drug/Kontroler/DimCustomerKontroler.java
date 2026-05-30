@@ -2,6 +2,7 @@ package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimCustomerRepository;
 
+import HD.projekt.drug.dto.DimCustomerDTO;
 import HD.projekt.drug.entity.DimCustomer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ public class DimCustomerKontroler {
 
 
     @GetMapping
-    public List<DimCustomer> getAllCustomer() {
-        return dimCustomerRepository.findAll();
+    public List<DimCustomerDTO> getAllCustomer() {
+        return dimCustomerRepository.findAllProjectedOrderByIdDesc();
     }
 }

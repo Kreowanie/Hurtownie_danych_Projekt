@@ -1,6 +1,7 @@
 package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimSourceRepository;
+import HD.projekt.drug.dto.DimSourceDTO;
 import HD.projekt.drug.entity.DimSource;
 import jakarta.persistence.Entity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ public class DimSourceKontroler {
     }
 
     @GetMapping
-    public List<DimSource> getAllSource(){
-        return  dimSourceRepository.findAll();
+    public List<DimSourceDTO> getAllSource(){
+        return  dimSourceRepository.findAllProjectedOrderByIdDesc();
     }
 }

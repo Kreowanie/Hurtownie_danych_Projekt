@@ -1,6 +1,7 @@
 package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimTransactionTypeRepository;
+import HD.projekt.drug.dto.DimTransactionTypeDTO;
 import HD.projekt.drug.entity.DimTransactionType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class DimTransactionTypeKontroler {
     }
 
     @GetMapping
-    public List<DimTransactionType> getAllTransactions() {
-        return dimTransactionTypeRepository.findAll();
+    public List<DimTransactionTypeDTO> getAllTransactions() {
+        return dimTransactionTypeRepository.findAllProjectedOrderByIdDesc();
     }
 }

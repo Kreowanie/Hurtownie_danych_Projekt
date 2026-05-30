@@ -1,6 +1,7 @@
 package HD.projekt.drug.Kontroler;
 
 import HD.projekt.drug.Repozytorium.DimDataQualityRepository;
+import HD.projekt.drug.dto.DimDataQualityDTO;
 import HD.projekt.drug.entity.DimDataQuality;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class DimDataQualityKontroler {
     }
 
     @GetMapping
-    public List<DimDataQuality> getAllQuality() {
-        return dimDataQualityRepository.findAll();
+    public List<DimDataQualityDTO> getAllQuality() {
+        return dimDataQualityRepository.findAllProjectedOrderByIdDesc();
     }
 }
