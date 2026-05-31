@@ -1,0 +1,222 @@
+USE HD_04;
+GO
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importCountry]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimCountry
+            (
+                Country,
+                CountryGroup,
+                IsUnitedKingdom
+            )
+            SELECT DISTINCT
+                sc.Country,
+                CASE
+                    WHEN sc.Country = N'United Kingdom' THEN N'United Kingdom'
+                    ELSE N'Export'
+                END AS CountryGroup,
+                CASE
+                    WHEN sc.Country = N'United Kingdom' THEN 1
+                    ELSE 0
+                END AS IsUnitedKingdom
+            FROM
+            (
+                SELECT DISTINCT
+                    LTRIM(RTRIM(
+                        CASE
+                            WHEN Country LIKE '%,%'
+                            THEN RIGHT(Country, CHARINDEX(',', REVERSE(Country)) - 1)
+                            ELSE Country
+                        END
+                    )) AS Country
+                FROM dbo.SalesClean
+                WHERE Country IS NOT NULL
+            ) sc
+            LEFT JOIN dbo.DimCountry dc
+                ON dc.Country = sc.Country
+            WHERE dc.CountryKey IS NULL
+              AND sc.Country <> N'';
+
+        END;
+        GO
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importCustomer]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimCustomer
+            (
+                CustomerNo,
+                IsCustomerKnown,
+                CustomerType
+            )
+            SELECT DISTINCT
+                sc.CustomerNo,
+                sc.IsCustomerKnown,
+                sc.CustomerType
+            FROM
+            (
+                SELECT DISTINCT
+                    CASE
+                        WHEN CustomerNo IS NULL THEN -1
+                        ELSE CustomerNo
+                    END AS CustomerNo,
+
+                    CASE
+                        WHEN CustomerNo IS NULL THEN 0
+                        ELSE IsCustomerKnown
+                    END AS IsCustomerKnown,
+
+                    CASE
+                        WHEN CustomerNo IS NULL THEN N'Brak klienta'
+                        WHEN IsCustomerKnown = 1 THEN N'Znany klient'
+                        ELSE N'Brak klienta'
+                    END AS CustomerType
+                FROM dbo.SalesClean
+            ) sc
+            LEFT JOIN dbo.DimCustomer dc
+                ON dc.CustomerNo = sc.CustomerNo
+            WHERE dc.CustomerKey IS NULL;
+
+        END;
+        GO
+
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importDataQuality]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimDataQuality
+            (
+                DataQualityFlag
+            )
+            SELECT DISTINCT
+                sc.DataQualityFlag
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimDataQuality dc
+                ON dc.DataQualityFlag = sc.DataQualityFlag
+            WHERE dc.DataQualityKey IS NULL
+              AND sc.DataQualityFlag IS NOT NULL;
+
+        END;
+        GO
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importDate]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimDate
+            (
+                DateKey,
+                FullDate,
+                DayNumber,
+                MonthNumber,
+                MonthName,
+                QuarterNumber,
+                YearNumber,
+                IsWeekend
+            )
+            SELECT DISTINCT
+                sc.DateKey,
+                CAST(sc.TransactionDate AS DATE) AS FullDate,
+                sc.SalesDay AS DayNumber,
+                sc.SalesMonth AS MonthNumber,
+                DATENAME(MONTH, sc.TransactionDate) AS MonthName,
+                sc.SalesQuarter AS QuarterNumber,
+                sc.SalesYear AS YearNumber,
+                sc.IsWeekend
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimDate dc
+                ON dc.DateKey = sc.DateKey
+            WHERE dc.DateKey IS NULL
+              AND sc.DateKey IS NOT NULL
+              AND sc.TransactionDate IS NOT NULL;
+
+        END;
+        GO
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importProduct]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimProduct
+            (
+                ProductNo,
+                ProductName,
+                ProductCategory
+            )
+            SELECT DISTINCT
+                sc.ProductNo,
+                sc.ProductName,
+                sc.ProductCategory
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimProduct dc
+                ON dc.ProductNo = sc.ProductNo
+            WHERE dc.ProductKey IS NULL
+              AND sc.ProductNo IS NOT NULL;
+
+        END;
+        GO
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importSource]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimSource
+            (
+                SourceDataset
+            )
+            SELECT DISTINCT
+                sc.SourceDataset
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimSource dc
+                ON dc.SourceDataset = sc.SourceDataset
+            WHERE dc.SourceKey IS NULL
+              AND sc.SourceDataset IS NOT NULL;
+
+        END;
+        GO
+
+
+        CREATE OR ALTER PROCEDURE [dbo].[importTransactionType]
+        AS
+        BEGIN
+
+            INSERT INTO dbo.DimTransactionType
+            (
+                TransactionType,
+                IsCancelled,
+                IsReturn
+            )
+            SELECT DISTINCT
+                sc.TransactionType,
+                sc.IsCancelled,
+                sc.IsReturn
+            FROM dbo.SalesClean sc
+            LEFT JOIN dbo.DimTransactionType dc
+                ON dc.TransactionType = sc.TransactionType
+            WHERE dc.TransactionTypeKey IS NULL
+              AND sc.TransactionType IS NOT NULL;
+
+        END;
+        GO
+
+
+
+        EXEC dbo.importCountry;
+        EXEC dbo.importCustomer;
+        EXEC dbo.importDataQuality;
+        EXEC dbo.importDate;
+        EXEC dbo.importProduct;
+        EXEC dbo.importSource;
+        EXEC dbo.importTransactionType;
+        GO
